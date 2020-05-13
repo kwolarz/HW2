@@ -43,6 +43,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private SensorManager sensorManager;
+    SensorEventListener sensorEventListener;
     private Points pointsOBJ = new Points();
 
     private TextView accTextView;
@@ -73,8 +74,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         pointFab.setVisibility(View.INVISIBLE);
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-        //sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
+        sensorEventListener = this;
+        sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        
     }
 
     @Override
@@ -119,9 +121,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String accText = "Acceleration: \nx: " + accX + " y: " + accY;
                 accTextView.setText(accText);
 
-                if(accTextView.getVisibility() == View.INVISIBLE)
+                if(accTextView.getVisibility() == View.INVISIBLE) {
+                    sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
                     accTextView.setVisibility(View.VISIBLE);
-                else accTextView.setVisibility(View.INVISIBLE);
+                }
+                else {
+                    accTextView.setVisibility(View.INVISIBLE);
+                    sensorManager.unregisterListener(sensorEventListener);
+                }
             }
         });
 
@@ -228,25 +235,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         pointsOBJ.points.add(new Point(x, y));
     }
 
-    private double roundACC(double number) {
-        number = Math.round(number * 10000);
-        number /= 10000;
-
-        return number;
-    }
-
     @Override
     public boolean onMarkerClick(Marker marker) {
 
-        Log.d("MARKER", ""+marker.getPosition());
         marker.showInfoWindow();
-//
-//        double x = roundACC(marker.getPosition().latitude);
-//        double y = roundACC(marker.getPosition().longitude);
-//        String accText = "Acceleration: \nx: " + x + " y: " + y;
-//
-//        accTextView.setText(accText);
-//        accTextView.setVisibility(View.VISIBLE);
+
         accFab.setVisibility(View.VISIBLE);
         accFab.animate().translationY(0).setDuration(500);
 
@@ -259,7 +252,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             accX = event.values[0];
             accY = event.values[1];
         }
