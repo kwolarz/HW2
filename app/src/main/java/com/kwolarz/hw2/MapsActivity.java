@@ -2,6 +2,8 @@ package com.kwolarz.hw2;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -72,7 +74,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-
+        //sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
     }
 
     @Override
@@ -126,8 +128,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         pointFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                accFab.animate().translationY(accFab.getHeight()).setDuration(300);
                 accFab.setVisibility(View.INVISIBLE);
+
+                pointFab.animate().translationY(accFab.getHeight()).setDuration(300);
                 pointFab.setVisibility(View.INVISIBLE);
+
+                //accTextView.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -239,9 +247,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //
 //        accTextView.setText(accText);
 //        accTextView.setVisibility(View.VISIBLE);
-
         accFab.setVisibility(View.VISIBLE);
+        accFab.animate().translationY(0).setDuration(500);
+
         pointFab.setVisibility(View.VISIBLE);
+        pointFab.animate().translationY(0).setDuration(500);
+
 
         return true;
     }
