@@ -6,13 +6,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -28,12 +31,16 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener {
 
     private static final String FILE_NAME = "storage.json";
 
     private GoogleMap mMap;
     private Points pointsOBJ = new Points();
+
+    private TextView accTextView;
+    private FloatingActionButton accFab;
+    private FloatingActionButton pointFab;
 
 
     @Override
@@ -47,6 +54,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         readJSON();
+
+        accTextView = findViewById(R.id.accTextView);
+        accTextView.setVisibility(View.INVISIBLE);
+
+        accFab = findViewById(R.id.accFab);
+        accFab.setVisibility(View.INVISIBLE);
+        pointFab = findViewById(R.id.pointFab);
+        pointFab.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -54,6 +69,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         mMap.setOnMapLongClickListener((GoogleMap.OnMapLongClickListener) this);
+        mMap.setOnMarkerClickListener(this);
 
         for (Point point : pointsOBJ.points) {
             LatLng markerLL = new LatLng(point.getX(), point.getY());
@@ -81,6 +97,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 mMap.animateCamera(CameraUpdateFactory.zoomOut());
+            }
+        });
+
+        accFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(accTextView.getVisibility() == View.INVISIBLE)
+                    accTextView.setVisibility(View.VISIBLE);
+                else accTextView.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        pointFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                accFab.setVisibility(View.INVISIBLE);
+                pointFab.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -171,5 +204,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.addMarker(new MarkerOptions().position(latLng).title(title));
         pointsOBJ.points.add(new Point(x, y));
+    }
+
+    private double roundACC(double number) {
+        number = Math.round(number * 10000);
+        number /= 10000;
+
+        return number;
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+
+        Log.d("MARKER", ""+marker.getPosition());
+        marker.showInfoWindow();
+//
+//        double x = roundACC(marker.getPosition().latitude);
+//        double y = roundACC(marker.getPosition().longitude);
+//        String accText = "Acceleration: \nx: " + x + " y: " + y;
+//
+//        accTextView.setText(accText);
+//        accTextView.setVisibility(View.VISIBLE);
+
+        accFab.setVisibility(View.VISIBLE);
+        pointFab.setVisibility(View.VISIBLE);
+
+        return true;
     }
 }

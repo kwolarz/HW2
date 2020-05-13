@@ -13,6 +13,20 @@
         android:layout_height="match_parent"
         tools:context=".MapsActivity" />
 
+
+    <TextView
+        android:id="@+id/accTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/clear"
+        android:layout_gravity="top|center"
+        android:layout_marginTop="20dp"
+        android:background="@android:color/holo_red_light"
+        android:textColor="@android:color/white"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:padding="10dp"/>
+
     <Button
         android:id="@+id/clearButton"
         android:layout_width="wrap_content"
@@ -27,8 +41,7 @@
         android:orientation="vertical"
         android:gravity="bottom"
         android:layout_marginBottom="30dp"
-        android:layout_marginLeft="10dp"
-        >
+        android:layout_marginLeft="10dp">
 
         <ImageButton
             android:id="@+id/zoomInButton"
@@ -43,6 +56,35 @@
             android:layout_height="wrap_content"
             android:layout_gravity="left|bottom"
             android:src="@drawable/ic_zoom_out_black_24dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="bottom|right"
+        android:paddingBottom="20dp">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/accFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:alpha="0.7"
+            android:layout_marginRight="8dp"
+            android:paddingBottom="5dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/ic_brightness_1_black_24dp"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/pointFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:alpha="0.7"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_cancel_black_24dp"/>
     </LinearLayout>
 
 </FrameLayout>
