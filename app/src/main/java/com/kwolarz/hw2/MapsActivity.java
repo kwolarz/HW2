@@ -2,6 +2,10 @@ package com.kwolarz.hw2;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -31,16 +35,19 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener, SensorEventListener {
 
     private static final String FILE_NAME = "storage.json";
 
     private GoogleMap mMap;
+    private SensorManager sensorManager;
     private Points pointsOBJ = new Points();
 
     private TextView accTextView;
     private FloatingActionButton accFab;
     private FloatingActionButton pointFab;
+
+    private double accX, accY;
 
 
     @Override
@@ -62,6 +69,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         accFab.setVisibility(View.INVISIBLE);
         pointFab = findViewById(R.id.pointFab);
         pointFab.setVisibility(View.INVISIBLE);
+
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+
     }
 
     @Override
@@ -103,6 +114,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         accFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String accText = "Acceleration: \nx: " + accX + " y: " + accY;
+                accTextView.setText(accText);
+
                 if(accTextView.getVisibility() == View.INVISIBLE)
                     accTextView.setVisibility(View.VISIBLE);
                 else accTextView.setVisibility(View.INVISIBLE);
@@ -231,4 +245,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         return true;
     }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            accX = event.values[0];
+            accY = event.values[1];
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 }
