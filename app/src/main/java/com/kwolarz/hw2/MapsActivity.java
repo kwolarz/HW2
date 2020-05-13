@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,51 +34,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private Points pointsOBJ = new Points();
-    //private List<Point> pointList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-       // pointList = new ArrayList<>();
-        //pointsOBJ = new Points(new ArrayList<Point>());
 
         readJSON();
-
     }
 
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-
         mMap.setOnMapLongClickListener((GoogleMap.OnMapLongClickListener) this);
 
         for (Point point : pointsOBJ.points) {
-            LatLng sydney = new LatLng(point.getX(), point.getY());
-            mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+            LatLng markerLL = new LatLng(point.getX(), point.getY());
+            String title = "Position:(" + point.getX() + ", " + point.getY() + ")";
+            mMap.addMarker(new MarkerOptions().position(markerLL).title(title));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(markerLL));
         }
+
+        this.findViewById(R.id.clearButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pointsOBJ.points.clear();
+                mMap.clear();
+            }
+        });
     }
 
     private void readJSON() {
-        //FileInputStream fis = null;
         Gson gson = new Gson();
         String text = "";
 
@@ -101,9 +95,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 text = sb.toString();
             }
 
-
-
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -112,26 +103,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Type pointsListType = new TypeToken<Points>(){}.getType();
         pointsOBJ = gson.fromJson(text, pointsListType);
-        //pointList = pointsOBJ.points;
-
-
     }
     
 
     @Override
     protected void onStop() {
-
-
         saveToJSON();
-
-        Log.d("LISTA", "" + pointsOBJ.points.get(0).getX());
         super.onStop();
     }
 
-
-
     private void saveToJSON() {
-        //Points points = new Points(pointList);
 
         Gson gson = new Gson();
         String pointJSON = gson.toJson(pointsOBJ);
@@ -141,12 +122,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         FileOutputStream fos = null;
 
-        Log.d("LISTA", "" + pointsOBJ.points.get(0).getX());
-
         try {
-            //fos = openFileOutput(file);
             fos = new FileOutputStream(file);
             fos.write(pointJSON.getBytes());
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -176,9 +155,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         String title = "Position:(" + x + ", " + y + ")";
 
-
         mMap.addMarker(new MarkerOptions().position(latLng).title(title));
-        //Point p = new Point(x, y);
         pointsOBJ.points.add(new Point(x, y));
     }
 }
