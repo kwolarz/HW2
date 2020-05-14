@@ -179,6 +179,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Type pointsListType = new TypeToken<Points>(){}.getType();
         pointsOBJ = gson.fromJson(text, pointsListType);
+
+        if (pointsOBJ == null)
+            pointsOBJ = new Points();
     }
     
 
