@@ -44,12 +44,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private SensorManager sensorManager;
     SensorEventListener sensorEventListener;
+
+    //Obiekt posiadajacy w sobie List, przechwouje punty i jest zapiswany przez Gson do JSONa
     private Points pointsOBJ = new Points();
 
     private TextView accTextView;
     private FloatingActionButton accFab;
     private FloatingActionButton pointFab;
 
+    //zmienne akcelerometru
     private double accX, accY;
 
 
@@ -61,7 +64,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
 
         readJSON();
 
@@ -86,6 +88,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMapLongClickListener((GoogleMap.OnMapLongClickListener) this);
         mMap.setOnMarkerClickListener(this);
 
+        //wypełnianie mapy zapisanymi w JSONie markerami
         for (Point point : pointsOBJ.points) {
             LatLng markerLL = new LatLng(point.getX(), point.getY());
             String title = "Position:(" + point.getX() + ", " + point.getY() + ")";
@@ -142,11 +145,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 pointFab.animate().translationY(accFab.getHeight()).setDuration(300);
                 pointFab.setVisibility(View.INVISIBLE);
 
+
+                //przy zamknięciu Floating buttonów zamyka się również TextView z wartościami akcelerometrów
+                //zaokomentowane ponieważ nie wiedziałem czy ma byc dodana taka funkcjinalność
                 //accTextView.setVisibility(View.INVISIBLE);
+                //sensorManager.unregisterListener(sensorEventListener);
             }
         });
     }
 
+    //odczyt z pliku JSON prz starcie aplikacji oraz wpisawanie wartości do zmiennej typu List znadjdującej się w pointsOBJ
+    //wykorzysttwana biblioteka Gson do oserializowania obiektu klasy Points
     private void readJSON() {
         Gson gson = new Gson();
         String text = "";
@@ -191,6 +200,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onStop();
     }
 
+    //zapis do pliku JSON wywoływany przy zamykaniu aplikacji
+    //przy pomocy GSON zapisuje serializuje obiekt klasy Points do formatu JSON oraz zapisuję w wewnętrznej pamięci
     private void saveToJSON() {
 
         Gson gson = new Gson();
@@ -220,6 +231,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    //metoda do zaokrąglania liczb typu double do dwóch miejsc po przecinku
     private double round(double number) {
         number = Math.round(number * 100);
         number /= 100;
@@ -253,6 +265,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return true;
     }
 
+    //przypisywanie wartości z akcelerometru do zmiennych
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
